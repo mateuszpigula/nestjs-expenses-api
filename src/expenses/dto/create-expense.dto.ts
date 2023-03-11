@@ -12,4 +12,7 @@ export class CreateExpenseDto {
 
   @ApiProperty()
   categoryId: number;
+
+  @ApiProperty()
+  fundId?: number;
 }
