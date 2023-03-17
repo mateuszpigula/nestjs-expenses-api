@@ -29,11 +29,26 @@ export class FundsService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} fund`;
+    return this.prisma.fund.findFirstOrThrow({ where: { id } });
   }
 
-  update(id: number, updateFundDto: UpdateFundDto) {
-    return `This action updates a #${id} fund`;
+  async update(id: number, updateFundDto: UpdateFundDto) {
+    const updatedFund = await this.prisma.fund.update({
+      where: { id },
+      data: updateFundDto,
+      include: {
+        Expense: {
+          select: {
+            amount: true,
+          },
+        },
+      },
+    });
+
+    return {
+      ...updatedFund,
+      summary: updatedFund.Expense.reduce((acc, cur) => (acc += cur.amount), 0),
+    };
   }
 
   remove(id: number) {
