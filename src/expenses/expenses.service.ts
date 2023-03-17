@@ -1,50 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { ExpensesRepository } from './expenses.repository';
 
 @Injectable()
 export class ExpensesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly expensesRepository: ExpensesRepository) {}
 
-  create(createExpenseDto: CreateExpenseDto) {
-    return this.prisma.expense.create({
-      data: createExpenseDto,
-      include: {
-        spender: true,
-        category: true,
-      },
-    });
+  async create(createExpenseDto: CreateExpenseDto) {
+    return this.expensesRepository.create(createExpenseDto);
   }
 
-  findAll() {
-    return this.prisma.expense.findMany({
-      include: {
-        spender: true,
-        category: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+  async findAll(date?: string) {
+    return this.expensesRepository.findAll(date);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} expense`;
+  async findOne(id: number) {
+    return this.expensesRepository.findExpenseById(id);
   }
 
-  update(id: number, updateExpenseDto: UpdateExpenseDto) {
-    return this.prisma.expense.update({
-      where: { id },
-      data: updateExpenseDto,
-      include: {
-        spender: true,
-        category: true,
-      },
-    });
+  async update(id: number, updateExpenseDto: UpdateExpenseDto) {
+    return this.expensesRepository.update(id, updateExpenseDto);
   }
 
-  remove(id: number) {
-    return this.prisma.expense.delete({ where: { id } });
+  async remove(id: number) {
+    return this.expensesRepository.delete(id);
   }
 }
