@@ -47,4 +47,5 @@ model Expense {
   categoryId Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  spentAt    DateTime @default(now())
 }

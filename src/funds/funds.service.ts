@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import dayjs from 'dayjs';
+import { sumUpExpenses } from 'src/helpers/expenses';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFundDto } from './dto/create-fund.dto';
 import { UpdateFundDto } from './dto/update-fund.dto';
@@ -15,6 +17,12 @@ export class FundsService {
     const funds = await this.prisma.fund.findMany({
       include: {
         Expense: {
+          where: {
+            spentAt: {
+              gte: dayjs().startOf('month').toDate(),
+              lt: dayjs().endOf('month').toDate(),
+            },
+          },
           select: {
             amount: true,
           },
@@ -23,7 +31,7 @@ export class FundsService {
     });
 
     return funds.map(({ Expense, ...fund }) => {
-      const summary = Expense.reduce((acc, cur) => (acc += cur.amount), 0);
+      const summary = sumUpExpenses(Expense);
       return { ...fund, summary };
     });
   }
@@ -47,7 +55,7 @@ export class FundsService {
 
     return {
       ...updatedFund,
-      summary: updatedFund.Expense.reduce((acc, cur) => (acc += cur.amount), 0),
+      summary: sumUpExpenses(updatedFund.Expense),
     };
   }
 

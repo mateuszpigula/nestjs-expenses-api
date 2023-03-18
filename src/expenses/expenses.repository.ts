@@ -22,7 +22,7 @@ export class ExpensesRepository {
   async findAll(date?: string): Promise<Expense[]> {
     const where = date
       ? {
-          createdAt: {
+          spentAt: {
             gte: dayjs(date).toDate(),
             lt: dayjs(date).endOf('month').toDate(),
           },
@@ -36,7 +36,7 @@ export class ExpensesRepository {
         category: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        spentAt: 'desc',
       },
     });
   }
